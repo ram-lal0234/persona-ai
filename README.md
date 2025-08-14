@@ -1,36 +1,116 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Persona AI Chat
 
-## Getting Started
+An interactive chat application that mimics the personalities of two tech educators: **Hitesh Choudhary** and **Piyush Garg**. Each persona has their own unique communication style and approach to teaching coding concepts.
 
-First, run the development server:
+## Features
 
+- **Dual Personas**: Choose between Hitesh's energetic Hinglish style or Piyush's structured professional approach
+- **Multi-Model Support**: Chat using either OpenAI GPT or Google Gemini AI models
+- **Interactive Interface**: Modern, responsive chat interface with real-time responses
+- **Persona Switching**: Easily switch between personas during your session
+
+## Personas
+
+### Hitesh Choudhary
+- **Style**: Casual Hindi-English (Hinglish) mix
+- **Tone**: Energetic, motivational, and humorous
+- **Approach**: Practical coding tips with relatable analogies (gym, cricket, food, movies)
+- **Best for**: Beginners looking for motivation and practical advice
+
+### Piyush Garg
+- **Style**: Clear, structured, and professional English
+- **Tone**: Calm, approachable, focused on technical accuracy
+- **Approach**: Step-by-step explanations with helpful analogies
+- **Best for**: Developers seeking detailed, structured learning
+
+## Setup
+
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd persona-ai
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Set up environment variables:
+Create a `.env.local` file in the root directory:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+# OpenAI API Key (required for GPT model)
+OPENAI_API_KEY=your_openai_api_key_here
 
-## Learn More
+# Google AI API Key (required for Gemini model)
+GEMINI_API_KEY=your_gemini_api_key_here
+```
 
-To learn more about Next.js, take a look at the following resources:
+4. Run the development server:
+```bash
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Usage
 
-## Deploy on Vercel
+1. **Select a Persona**: Choose between Hitesh or Piyush on the home page
+2. **Choose AI Model**: Select between OpenAI GPT or Google Gemini
+3. **Start Chatting**: Ask questions about coding, development, or tech
+4. **Switch Personas**: Use the back button to return to persona selection
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## API Keys Setup
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### OpenAI API Key
+1. Visit [OpenAI Platform](https://platform.openai.com/)
+2. Create an account and get your API key
+3. Add it to your `.env.local` file
+
+### Google Gemini API Key
+1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Create an API key
+3. Add it to your `.env.local` file
+
+## Technologies Used
+
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Styling**: Tailwind CSS
+- **AI Models**: OpenAI GPT, Google Gemini
+- **Icons**: Lucide React
+- **Deployment**: Vercel-ready
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── api/
+│   │   └── chat/          # Chat API endpoint
+│   ├── components/         # React components
+│   │   ├── PersonaCard.tsx
+│   │   ├── ChatInterface.tsx
+│   │   └── ModelSelector.tsx
+│   ├── utils/             # Utility functions
+│   │   └── personaPrompt.ts
+│   ├── layout.tsx         # Root layout
+│   └── page.tsx           # Home page
+├── public/
+│   └── images/            # Persona images
+└── package.json
+```
+
+## Contributing
+
+Feel free to submit issues and enhancement requests!
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
