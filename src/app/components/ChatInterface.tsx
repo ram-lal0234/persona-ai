@@ -228,8 +228,22 @@ export default function ChatInterface({ selectedPersona }: ChatInterfaceProps) {
 
   const isMessageLong = (content: string) => content.length > 500;
 
+  // Helper function to check if we can send messages
+  const canSendMessage = () => {
+    if (!inputValue.trim() || isLoading) return false;
+    
+    // If GPT is selected, check for API key
+    if (selectedModel === "openai") {
+      const gptApiKey = localStorage.getItem("gpt-api-key");
+      return !!gptApiKey;
+    }
+    
+    // Gemini doesn't need API key check (uses env vars)
+    return true;
+  };
+
   const sendMessage = async () => {
-    if (!inputValue.trim() || isLoading) return;
+    if (!canSendMessage()) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -239,6 +253,7 @@ export default function ChatInterface({ selectedPersona }: ChatInterfaceProps) {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const messageContent = inputValue;
     setInputValue("");
     setIsLoading(true);
 
@@ -253,16 +268,27 @@ export default function ChatInterface({ selectedPersona }: ChatInterfaceProps) {
     setMessages((prev) => [...prev, assistantMessage]);
 
     try {
+      // Prepare request body
+      const requestBody: any = {
+        message: messageContent,
+        persona: selectedPersona,
+        model: selectedModel,
+      };
+
+      // Add API key for GPT
+      if (selectedModel === "openai") {
+        const gptApiKey = localStorage.getItem("gpt-api-key");
+        if (gptApiKey) {
+          requestBody.apiKey = gptApiKey;
+        }
+      }
+
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          message: inputValue,
-          persona: selectedPersona,
-          model: selectedModel,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
@@ -282,21 +308,14 @@ export default function ChatInterface({ selectedPersona }: ChatInterfaceProps) {
           "[ChatInterface] Displaying result step content:",
           data.content
         );
-        console.log(
-          "[ChatInterface] Assistant message ID:",
-          assistantMessage.id
-        );
 
-        setMessages((prev) => {
-          console.log("[ChatInterface] Previous messages:", prev);
-          const updated = prev.map((msg) =>
+        setMessages((prev) =>
+          prev.map((msg) =>
             msg.id === assistantMessage.id
               ? { ...msg, content: data.content }
               : msg
-          );
-          console.log("[ChatInterface] Updated messages:", updated);
-          return updated;
-        });
+          )
+        );
       } else if (data.content) {
         // Fallback: if no step specified, still show the content
         console.log(
@@ -617,23 +636,37 @@ export default function ChatInterface({ selectedPersona }: ChatInterfaceProps) {
               </button>
             </div>
 
-            {/* Show saved key status for both models */}
-            {selectedModel === "openai" &&
-              localStorage.getItem("gpt-api-key") && (
-                <div className="flex items-center space-x-2 text-xs text-orange-700 bg-orange-50 p-2 rounded-lg border border-orange-200">
-                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                  <span>GPT API key saved</span>
-                  <button
-                    onClick={() => {
-                      localStorage.removeItem("gpt-api-key");
-                      alert("GPT API key removed from local storage");
-                    }}
-                    className="text-orange-600 hover:text-orange-800 underline"
-                  >
-                    Remove
-                  </button>
-                </div>
-              )}
+            {/* Show saved key status for GPT */}
+            {selectedModel === "openai" && (
+              <div className="text-xs">
+                {localStorage.getItem("gpt-api-key") ? (
+                  <div className="flex items-center space-x-2 text-orange-700 bg-orange-50 p-2 rounded-lg border border-orange-200">
+                    <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                    <span>GPT API key saved</span>
+                    <button
+                      onClick={() => {
+                        localStorage.removeItem("gpt-api-key");
+                        alert("GPT API key removed from local storage");
+                      }}
+                      className="text-orange-600 hover:text-orange-800 underline"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-2 text-red-700 bg-red-50 p-2 rounded-lg border border-red-200">
+                    <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                    <span>GPT API key required</span>
+                    <button
+                      onClick={() => setShowApiKeyModal(true)}
+                      className="text-red-600 hover:text-red-800 underline"
+                    >
+                      Add Key
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             {selectedModel === "gemini" &&
               localStorage.getItem("gemini-api-key") && (
@@ -655,8 +688,9 @@ export default function ChatInterface({ selectedPersona }: ChatInterfaceProps) {
 
           <button
             onClick={sendMessage}
-            disabled={!inputValue.trim() || isLoading}
+            disabled={!canSendMessage()}
             className="rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 px-4 py-2 text-white hover:from-orange-600 hover:to-amber-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg text-sm"
+            title={selectedModel === "openai" && !localStorage.getItem("gpt-api-key") ? "GPT API key required" : "Send message"}
           >
             <Send className="h-4 w-4" />
           </button>
@@ -670,6 +704,10 @@ export default function ChatInterface({ selectedPersona }: ChatInterfaceProps) {
         modelType={modalModelType}
         onSave={(key) => {
           console.log(`[ChatInterface] ${modalModelType.toUpperCase()} API key saved:`, key);
+          // Force a re-render to update the status display
+          setTimeout(() => {
+            setShowApiKeyModal(false);
+          }, 100);
         }}
       />
     </div>
