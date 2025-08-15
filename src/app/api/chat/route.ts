@@ -3,8 +3,7 @@ import OpenAI from 'openai';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { getPersonaPrompt } from '../../utils/personaPrompt';
 
-// Initialize OpenAI client
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
 
 // Initialize Google AI client (Gemini)
 const genAI = process.env.GEMINI_API_KEY
@@ -33,23 +32,7 @@ Respond naturally as the persona, without any JSON formatting or step indicators
 
 
 
-// OpenAI request (fallback function - not used anymore)
-async function handleOpenAI(message: string, persona: string) {
-  const personaPrompt = getPersonaPrompt(persona);
-  if (!personaPrompt) throw new Error(`Invalid persona: ${persona}`);
 
-  const enhancedPrompt = createEnhancedPersonaPrompt(personaPrompt, message);
-  const completion = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
-    messages: [
-      { role: 'system', content: enhancedPrompt },
-      { role: 'user', content: message },
-    ],
-    max_tokens: 1000,
-  });
-
-  return completion.choices[0]?.message?.content || '';
-}
 
 // Gemini request
 async function handleGemini(message: string, persona: string) {

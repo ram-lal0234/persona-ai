@@ -1,21 +1,6 @@
 import personasData from './personas_hitesh_piyush.json';
 
-interface Persona {
-  id: string;
-  name: string;
-  who_are_you: string;
-  speaking_style: {
-    language: string;
-    tone: string[];
-    quirks: string[];
-    signature_lines: string[];
-  };
-  guardrails: {
-    do: string[];
-    dont: string[];
-  };
-  system_instruction: string;
-}
+
 
 function getPersonaPrompt(persona: string): string {
   // Find the persona in the JSON data

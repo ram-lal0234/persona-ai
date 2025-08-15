@@ -269,7 +269,12 @@ export default function ChatInterface({ selectedPersona }: ChatInterfaceProps) {
 
     try {
       // Prepare request body
-      const requestBody: any = {
+      const requestBody: {
+        message: string;
+        persona: string;
+        model: string;
+        apiKey?: string;
+      } = {
         message: messageContent,
         persona: selectedPersona,
         model: selectedModel,
@@ -389,14 +394,7 @@ export default function ChatInterface({ selectedPersona }: ChatInterfaceProps) {
     return persona === "Hitesh" ? "Hitesh Choudhary" : "Piyush Garg";
   };
 
-  // Function to get saved API keys
-  const getGeminiApiKey = () => {
-    return localStorage.getItem("gemini-api-key");
-  };
 
-  const getGptApiKey = () => {
-    return localStorage.getItem("gpt-api-key");
-  };
 
   return (
     <div className="flex h-full flex-col bg-white rounded-lg shadow-lg overflow-hidden border border-orange-200">
